@@ -6,23 +6,28 @@ struct CardView: View {
     var resetCardTrigger: Binding<Int>
     var card: MemoGameModel<String>.Card
     
-    
+    @State private var rotationAngle: Double = 0
+
     var cardContent: MemoGameModel<String>.Card {
         card
     }
     
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(color)
-                .frame(width: 85, height: 85)
+        CirclePart(endAngel: .degrees(270))
+            .overlay(Text(card.content))
+            .padding()
+            .modifier(TransformIntoCard(isFaceUp: card.isFacedUp))
             
-            
-            Text(emoji)
-                .font(.system(size: 200))
-                .minimumScaleFactor(0.01)
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 200, height: 200)
-        }
+            .rotationEffect(.degrees(rotationAngle))
+            .onChange(of: card.isMatched) { matched in
+                if matched {
+                    withAnimation(Animation.linear(duration: 2).repeatCount(1, autoreverses: false)) {
+                        rotationAngle += 360
+                    }
+                }
+            }
     }
 }
+
+    
+
